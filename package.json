@@ -1,0 +1,22 @@
+{
+  "name": "rai-image-annotator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuonghungvinh/RAI_Image_annotator.git"
+  },
+  "author": "VinhIT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vuonghungvinh/RAI_Image_annotator/issues"
+  },
+  "homepage": "https://github.com/vuonghungvinh/RAI_Image_annotator#readme",
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
