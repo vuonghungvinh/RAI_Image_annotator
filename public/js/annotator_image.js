@@ -10,7 +10,7 @@
         ");
     };
 
-    $.fn.addAnnotatorImage = function(x, y) {0.
+    $.fn.addAnnotatorImage = function(x, y) {
         if (this.length < 1){
             return this;
         }
