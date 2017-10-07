@@ -1,3 +1,24 @@
 .contentImage #annotator_image {
     cursor: crosshair;
 }
+
+.borderContent{
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#color, #bcolor{
+    height: 39px;
+}
+
+.contentAnnotator button{
+    opacity: 0.6;
+}
+
+.contentAnnotator button.select{
+    opacity: 1;
+}
+
+.createcontent{
+    text-align: center;
+}

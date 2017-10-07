@@ -17,6 +17,12 @@
   },
   "homepage": "https://github.com/vuonghungvinh/RAI_Image_annotator#readme",
   "dependencies": {
-    "express": "^4.16.1"
+    "consolidate": "^0.14.5",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.1",
+    "express-session": "^1.15.6",
+    "handlebars": "^4.0.10",
+    "mustache": "^2.3.0",
+    "pug": "^2.0.0-rc.4"
   }
 }
