@@ -10,7 +10,7 @@ var Handlebars = require('handlebars');
 var datas = require('./util.js');
 
 app.use(express.static('public'));
-// app.engine('html', engines.mustache);
+app.engine('html', engines.mustache);
 app.set('view engine', 'pug');
 // app.set('views', __dirname + '/views');
 app.set('views', './views');
