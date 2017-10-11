@@ -22,3 +22,21 @@
 .createcontent{
     text-align: center;
 }
+
+.error{
+	color: #ff0000;
+    font-size: 12px;
+}
+
+
+.hidden{
+	display: none;
+}
+
+button{
+	cursor: pointer;
+}
+
+#listAnnotator .label{
+	cursor: pointer;
+}

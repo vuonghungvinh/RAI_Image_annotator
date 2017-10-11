@@ -6,9 +6,28 @@ var session = require('express-session');
 var engines = require('consolidate');
 const pug = require('pug');
 var Handlebars = require('handlebars');
-
 var datas = require('./util.js');
+//firebase
+var firebase = require("firebase");
+require("firebase/auth");
+require("firebase/database");
+var config = {
+    apiKey: "AIzaSyCSJNAsvzXCW4yZELnGK7wo51jQ1iOKipA",
+    authDomain: "annotatorimage.firebaseapp.com",
+    databaseURL: "https://annotatorimage.firebaseio.com",
+    projectId: "annotatorimage",
+    storageBucket: "annotatorimage.appspot.com",
+    messagingSenderId: "479345588309"
+};
+firebase.initializeApp(config);
+var email = "vuonghungvinhit@gmail.com";
+var password = "annotator_image";
 
+firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+   console.log(error.code);
+   console.log(error.message);
+});
+////////////////
 app.use(express.static('public'));
 app.engine('html', engines.mustache);
 app.set('view engine', 'pug');
@@ -22,9 +41,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //To parse json data
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {                     
+app.get('/', function (req, res) {    
+    // var ref = firebase.database().ref();
+    
+    // ref.on("value", function(snapshot) {
+    //    console.log(snapshot.val()['annotators']);
+    // }, function (error) {
+    //    console.log("Error: " + error.code);
+    // });
+
+    // var postsRef = ref.child("annotators");
+    // postsRef.push({
+    //     html: "html1",
+    //     label: "label2"
+    // });
     res.render("index.html");
-    // res.json({'id': ';ddadafasf'});
 });
 
 app.post('/create', function(req, res) {
@@ -34,6 +65,40 @@ app.post('/create', function(req, res) {
     }
     datas[id] = req.body['html'];
     res.json({id: id});
+});
+
+app.post("/saveAnnotator", function(req, res){
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators");
+    postsRef.push(req.body);
+    res.json({status:"ok"});
+});
+
+app.post("/updateAnnotator", function(req, res){
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.body.key);
+    postsRef.set(req.body.data);
+    res.json({status:"ok"});
+});
+
+app.post("/deleteAnnotator", function(req, res){
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.body.key);
+    postsRef.remove();
+    res.json({status:"ok"});
+});
+
+app.get("/listAnnotator", function(req, res){
+    var ref = firebase.database().ref();
+    ref.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.json(null);
+        } else {
+            res.json(snapshot.val()['annotators']);
+        }
+    }, function (error) {
+        res.json({"error": error.code});
+    });
 });
 
 app.get("/review/:id", function(req, res){

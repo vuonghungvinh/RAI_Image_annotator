@@ -61,4 +61,32 @@
         $(this).addClass("select");
     }
 
+    $.fn.loadData = function(data) {
+        $(this).css({width: data.width, height: data.height});
+        $(this).empty();
+        $(this).append("\
+            <img src='"+data.src+"' style='width: 100%; height: 100%'/>\
+        ");
+        $(this).append("\
+            <div class='contentAnnotator'></div>\
+        ");
+        for (var i=0; i < data.dots.length; i++) {
+            $(this).find(".contentAnnotator").append("\
+                <button style='width: 34px; height: 34px; position: absolute; left: "+data.dots[i].left+"; top: "+data.dots[i].top+"; background: "+data.dots[i].background+"; color: "+data.dots[i].color+"; border-radius: 50%' type='button' class='note_annotator' data-container='body' data-toggle='popover' title='"+data.dots[i]['data-original-title']+"' data-placement='top' data-content='"+data.dots[i]['data-content']+"'>\
+                    "+data.dots[i].text+"\
+                </button>\
+            ");
+        }
+        $('.note_annotator').popover({
+            trigger: 'focus'
+        });
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        });
+        $(".note_annotator").draggable({
+            containment: "#annotator_image",
+            cancel: false
+        });
+    }
+
  })( jQuery );

@@ -1,4 +1,6 @@
 var dot=null;
+var listAnnotator;
+var key;
 $(document).ready(function(){
 
     if ($("#urlImage").length > 0){
@@ -71,9 +73,7 @@ $(document).ready(function(){
         $("#annotator_image").css({ width: $("#width").val(), height: $(this).val() });
     });
 
-    $(".createcontent button").click(function(){
-        console.log("here");
-        console.log($("#annotator_image")[0].outerHTML);
+    $(".createcontent .create").click(function(){
         $.ajax({
             url : "/create",
             type : "POST",
@@ -82,14 +82,149 @@ $(document).ready(function(){
                  html : $("#annotator_image")[0].outerHTML
             },
             success : function (result){
-                console.log(result);
                 window.open("review/"+result['id'], '_blank');
             }
         });
     });
 
+    $(".createcontent .btnsave").click(function(){
+        $("#annotatorModal .errname").addClass("hidden");
+        $("#annotatorModal #annotatorlabel").val("");
+        $("#saveAnnotator").attr("disabled", "disabled");
+    });
+
+    $("#annotatorModal #annotatorlabel").on("change keyup paste", function(){
+        if ($(this).val().length > 0) {
+            $("#annotatorModal .errname").addClass("hidden");
+            $("#saveAnnotator").removeAttr("disabled");
+        } else {
+            $("#annotatorModal .errname").removeClass("hidden");
+            $("#saveAnnotator").attr("disabled", "disabled");
+        }
+    });
+
+    $("#saveAnnotator").click(function(){
+        var annotator = getDatas();
+        $.ajax({
+            url : "/saveAnnotator",
+            type : "POST",
+            dataType:"json",
+            data : annotator,
+            success: function (result){
+                $('#annotatorModal').modal('toggle');
+                toastr.success('Successfully created new Annotator');
+                getList();
+            }
+        });
+    });
+
+    $("#listAnnotator tbody").on("click", ".label", function(){
+        var key = $(this).parent().parent().attr("key");
+        $("#annotator_image").loadData(listAnnotator[key]);
+    });
+
+    $("#listAnnotator tbody").on("click", ".update", function(){
+        key = $(this).parent().parent().attr("key");
+        $("#updateAnnotatorModal #updateannotatorlabel").val(listAnnotator[key].label);
+        $("#updateAnnotatorModal").modal('toggle');
+    });
+
+    $("#listAnnotator tbody").on("click", ".delete", function(){
+        key = $(this).parent().parent().attr("key");
+        $("#deleteAnnotatorModal").modal('toggle');
+        $("#deleteAnnotatorModal .title").text("Do you want delete \"" + listAnnotator[key].label +"\"?");
+    });
+
+    $("#deleteAnnotatorModal #deleteAnnotator").click(function(){
+        $.ajax({
+            url : "/deleteAnnotator",
+            type : "POST",
+            dataType:"json",
+            data : {key: key},
+            success: function (result){
+                $('#deleteAnnotatorModal').modal('toggle');
+                toastr.success('Successfully deleted Annotator');
+                getList();
+            }
+        });
+    });
+    
+    $("#updateAnnotatorModal #updateannotatorlabel").on("change keyup paste", function(){
+        if ($(this).val().length > 0) {
+            $("#updateAnnotatorModal .errname").addClass("hidden");
+            $("#updateAnnotatorModal #updateAnnotator").removeAttr("disabled");
+        } else {
+            $("#updateAnnotatorModal .errname").removeClass("hidden");
+            $("#updateAnnotatorModal #updateAnnotator").attr("disabled", "disabled");
+        }
+    });
+
+    $("#updateAnnotatorModal #updateAnnotator").click(function(){
+        var datas = getDatas();
+        datas['label'] = $("#updateAnnotatorModal #updateannotatorlabel").val();
+        $.ajax({
+            url : "/updateAnnotator",
+            type : "POST",
+            dataType:"json",
+            data : {key: key, data: datas},
+            success: function (result){
+                getList();
+                toastr.success('Successfully updated Annotator');
+                $("#updateAnnotatorModal").modal('toggle');
+            }
+        });
+    });
+
     CheckDot();
+    getList();
 });
+
+function getDatas() {
+    var dots = [];
+    $("#annotator_image").children(".contentAnnotator").children(".note_annotator").each(function(){
+        var dot = { text: $(this).text().trim(), left: $(this).css("left"), top: $(this).css("top"), background: hexc($(this).css("backgroundColor")), color: hexc($(this).css("color")), "data-content": $(this).attr("data-content"), "data-original-title": $(this).attr("data-original-title") };
+        dots.push(dot);
+    });
+    var src = $("#annotator_image").children("img").attr("src");
+    var width = $("#annotator_image")[0].offsetWidth;
+    var height = $("#annotator_image")[0].offsetHeight;
+    var annotator = {
+        src: src,
+        width: width,
+        height: height,
+        dots: dots,
+        label: $("#annotatorModal #annotatorlabel").val()
+    };
+    return annotator;
+}
+
+function getList() {
+    $.ajax({
+        url : "/listAnnotator",
+        type : "GET",
+        dataType:"json",
+        success : function (result){
+            listAnnotator = result;
+            $("#listAnnotator tbody").empty();
+            var i=0;
+            $.each(result, function(key, value) {
+                i++;
+                $("#listAnnotator tbody").append(`
+                    <tr key="`+key+`">
+                        <td style="width: 70px;">`+i+`</td>
+                        <td>
+                            <span class="label">`+value.label+`</span>
+                        </td>
+                        <td style="width: 152px;">
+                            <button type="button" class="btn btn-success btn-sm update">Update</button>
+                            <button type="button" class="btn btn-danger btn-sm delete">Delete</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+    });
+}
 
 function hexc(colorval) {
     var parts = colorval.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
