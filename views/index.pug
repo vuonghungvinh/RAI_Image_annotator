@@ -1,0 +1,104 @@
+doctype html
+html
+    head
+        title Image annotator
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1, shrink-to-fit=no")
+        link(href='css/custom.css', rel='stylesheet')
+        link(href='//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css', rel='stylesheet')
+        link(href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css', rel='stylesheet')
+        link(href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css', rel='stylesheet')
+        script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js")
+        script(src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js")
+        script(src="js/annotator_image.js")
+        script(src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js")
+        script(src="js/custom.js")
+    body
+        div.container
+            div.demo-content
+                br
+                h1.text-center Create/Edit Annotators
+                br
+                div.row
+                    div.col-md-8
+                        h4 1. Enter the image URL
+                        div.input-group
+                            input.form-control#urlImage(value="http://www.dotdesign.in/hotspot/img/demo_img3.jpg", type="text", placeholder="Url Image")
+                br
+                h4 2. Define the image size
+                div.borderContent
+                    div.row
+                        div.col
+                            label(for="width") Width
+                            div.input-group
+                                input#width.form-control(type="number" value="642", placeholder="Width", aria-label="Width", aria-describedby="width-addon2")
+                                span#width-addon2.input-group-addon px
+                            br
+                            label(for="height") Height
+                            div.input-group
+                                input#height.form-control(type="number", value="435", placeholder="Height", aria-label="Height", aria-describedby="height-addon2")
+                                span#height-addon2.input-group-addon px
+                        div.col
+                br
+                h4 3. Position the dots
+                div.contentImage.borderContent
+                    div#annotator_image
+                br
+                h4 4. Detail the dot attributes
+                div.contentTool
+                    div.row
+                        div.col.dottool
+                            div.borderContent
+                                div.row
+                                    div.col
+                                        label(for="title") Title
+                                        div.input-group
+                                            input.form-control#title(type="text")
+                                    div.col
+                                        label(for="contenttext") Content text
+                                        div.input-group
+                                            input#contenttext.form-control(type="text")
+                                br
+                                div.row
+                                    div.col
+                                        label(for="bcolor") Background Color
+                                        div.input-group
+                                            input#bcolor.form-control(type="color", value="#ff0000", aria-describedby="bcolor-addon")
+                                            span.input-group-addon#bcolor-addon #ff0000
+                                    div.col
+                                        label(for="titledot") Title dot
+                                        div.input-group
+                                            input#titledot.form-control(type="text")
+                                br
+                                div.row
+                                    div.col
+                                        label(for="color") Text Color
+                                        div.input-group
+                                            input.form-control#color(type="color", value="#000000", aria-describedby="color-addon")
+                                            span#color-addon.input-group-addon #000000
+                                    div.col.contentdeletedot
+                                        button.btn.btn-danger.btn-sm#deletedot(disabled type="button") Delete Dot
+                br
+                p.createcontent
+                    button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Save Annotation
+                    button.btn.btn-success.btn-sm.create(type="button") Create embedding code
+                    a(href="/listannotator").btn.btn-danger.btn-sm.back(type="button") Cancel
+            //- createModal
+            div#annotatorModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="exampleModalLabel", aria-hidden="true")
+                div.modal-dialog(role="document")
+                    div.modal-content
+                        div.modal-header
+                            h5.modal-title#exampleModalLabel Name
+                            button.close(type="button", data-dismiss="modal", aria-label="Close")
+                                span(aria-hidden="true") &times;
+                        div.modal-body
+                            div.input-group
+                                input#annotatorlabel.form-control(type="text", placeholder="Annotator Name")
+                            span.errorhidden.errname Name is required!
+                        div.modal-footer
+                            button.btn.btn-danger(type="button", data-dismiss="modal") Cancel
+                            button.btn.btn-primary(type="button", disabled id="saveAnnotator") Create
+        script(type="text/javascript").
+                                        var data = !{JSON.stringify(data)};

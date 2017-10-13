@@ -41,24 +41,47 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //To parse json data
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {    
-    // var ref = firebase.database().ref();
-    
-    // ref.on("value", function(snapshot) {
-    //    console.log(snapshot.val()['annotators']);
-    // }, function (error) {
-    //    console.log("Error: " + error.code);
-    // });
+function checkAuth(req, res, next) {
+    if (req.url !== '/login' && (!req.session || !req.session.authenticated)) {
+        res.redirect('/login');
+        return;
+    }
+    next();
+}
 
-    // var postsRef = ref.child("annotators");
-    // postsRef.push({
-    //     html: "html1",
-    //     label: "label2"
-    // });
-    res.render("index.html");
+app.use(checkAuth);
+
+app.get('/', function (req, res, next) {    
+    res.render("index", {"data": null});
 });
 
-app.post('/create', function(req, res) {
+app.get('/login', function(req, res, next){
+    res.render('login', {error: false});
+});
+
+app.post('/login', function(req, res, next){
+    if (req.body.username && req.body.username === 'annotatorimage' && req.body.password && req.body.password === '123456') {
+        req.session.authenticated = true;
+        res.redirect('/listannotator');
+    } else {
+        res.render('login', {error: true, username: req.body.username});
+    }
+});
+
+app.get("/listannotator", function(req, res, next){
+    var ref = firebase.database().ref();
+    ref.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.render("listannotators", {"lists": []});
+        } else {
+            res.render("listannotators", {"lists": snapshot.val()['annotators']});
+        }
+    }, function (error) {
+        res.render("listannotators", {"lists": []});
+    });
+});
+
+app.post('/create', function(req, res, next) {
     var id = makeid();
     while (datas[id] != undefined) {
         id = makeid();
@@ -67,28 +90,28 @@ app.post('/create', function(req, res) {
     res.json({id: id});
 });
 
-app.post("/saveAnnotator", function(req, res){
+app.post("/saveAnnotator", function(req, res, next){
     var ref = firebase.database().ref();
     var postsRef = ref.child("annotators");
     postsRef.push(req.body);
     res.json({status:"ok"});
 });
 
-app.post("/updateAnnotator", function(req, res){
+app.post("/updateAnnotator", function(req, res, next){
     var ref = firebase.database().ref();
     var postsRef = ref.child("annotators/"+req.body.key);
     postsRef.set(req.body.data);
     res.json({status:"ok"});
 });
 
-app.post("/deleteAnnotator", function(req, res){
+app.post("/deleteAnnotator", function(req, res, next){
     var ref = firebase.database().ref();
     var postsRef = ref.child("annotators/"+req.body.key);
     postsRef.remove();
     res.json({status:"ok"});
 });
 
-app.get("/listAnnotator", function(req, res){
+app.post("/listAnnotator", function(req, res, next){
     var ref = firebase.database().ref();
     ref.once("value", function(snapshot) {
         if (snapshot.val() === null) {
@@ -101,7 +124,7 @@ app.get("/listAnnotator", function(req, res){
     });
 });
 
-app.get("/review/:id", function(req, res){
+app.get("/review/:id", function(req, res, next){
     if (datas[req.params.id] === undefined) {
         res.render("error");
     } else {
@@ -109,7 +132,7 @@ app.get("/review/:id", function(req, res){
     }
 });
 
-app.get("/annotator/:id", function(req, res) {
+app.get("/annotator/:id", function(req, res, next) {
     if (datas[req.params.id] === undefined) {
         res.render("error");
     } else {
@@ -117,7 +140,7 @@ app.get("/annotator/:id", function(req, res) {
     }
 });
 
-app.get("/download/:id", function(req, res){
+app.get("/download/:id", function(req, res, next){
     if (datas[req.params.id] === undefined) {
         res.render("error");
         return;
@@ -161,15 +184,28 @@ app.get("/download/:id", function(req, res){
     });
 });
 
+app.get('/:key', function (req, res, next) {
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.params.key);
+    postsRef.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.render("index", {"data": null});
+        } else {
+            res.render("index", {"data": snapshot.val()});
+        }
+    }, function (error) {
+        res.render("index", {"data": null});
+    });
+});
+
 function makeid() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  
     for (var i = 0; i < 20; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
-  }
+}
 
 
 var server = app.listen(3000, function () {

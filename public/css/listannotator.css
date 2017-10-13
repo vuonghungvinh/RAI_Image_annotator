@@ -1,0 +1,23 @@
+.load, .rename{
+    margin-right: 4px;
+}
+button{
+    cursor: pointer;
+}
+
+.error{
+	color: #ff0000;
+    font-size: 12px;
+}
+
+.hidden{
+	display: none;
+}
+
+.addannotator{
+    padding-right: 15px;
+}
+
+.addannotator a{
+    font-size: 25px;
+}

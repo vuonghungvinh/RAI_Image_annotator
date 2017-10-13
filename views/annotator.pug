@@ -2,6 +2,8 @@ doctype html
 html
     head
         title Image annotator
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1, shrink-to-fit=no")
         link(href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css', rel='stylesheet')
         link(href='../css/review.css', rel='stylesheet')
         script(src='https://code.jquery.com/jquery-3.2.1.min.js')
@@ -12,5 +14,7 @@ html
     body
         div.container
             if id
-                h1 Review!
+                br
+                h1.text-center Review!
+                br
             #app!= html

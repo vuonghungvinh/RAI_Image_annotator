@@ -1,0 +1,34 @@
+.login{
+    background: #74bf58;
+    height:100vh;
+}
+
+.title{
+    color: #fff;
+    padding-top: 45px;
+    margin-bottom: 32px;
+}
+
+#frmlogin{
+    max-width: 435px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 48px;
+}
+
+#frmlogin button{
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.error{
+    color: red;
+}
+
+button{
+    cursor: pointer;
+}
+
+.hidden{
+    display: none;
+}

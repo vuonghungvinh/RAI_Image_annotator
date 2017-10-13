@@ -23,6 +23,10 @@
     text-align: center;
 }
 
+.createcontent .create{
+    margin: 0 4px;
+}
+
 .error{
 	color: #ff0000;
     font-size: 12px;
@@ -39,4 +43,13 @@ button{
 
 #listAnnotator .label{
 	cursor: pointer;
+}
+
+.contentdeletedot{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.contentdeletedot #deletedot{
+    align-self: flex-end;
 }

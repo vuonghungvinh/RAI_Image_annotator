@@ -113,38 +113,6 @@ $(document).ready(function(){
             success: function (result){
                 $('#annotatorModal').modal('toggle');
                 toastr.success('Successfully created new Annotator');
-                getList();
-            }
-        });
-    });
-
-    $("#listAnnotator tbody").on("click", ".label", function(){
-        var key = $(this).parent().parent().attr("key");
-        $("#annotator_image").loadData(listAnnotator[key]);
-    });
-
-    $("#listAnnotator tbody").on("click", ".update", function(){
-        key = $(this).parent().parent().attr("key");
-        $("#updateAnnotatorModal #updateannotatorlabel").val(listAnnotator[key].label);
-        $("#updateAnnotatorModal").modal('toggle');
-    });
-
-    $("#listAnnotator tbody").on("click", ".delete", function(){
-        key = $(this).parent().parent().attr("key");
-        $("#deleteAnnotatorModal").modal('toggle');
-        $("#deleteAnnotatorModal .title").text("Do you want delete \"" + listAnnotator[key].label +"\"?");
-    });
-
-    $("#deleteAnnotatorModal #deleteAnnotator").click(function(){
-        $.ajax({
-            url : "/deleteAnnotator",
-            type : "POST",
-            dataType:"json",
-            data : {key: key},
-            success: function (result){
-                $('#deleteAnnotatorModal').modal('toggle');
-                toastr.success('Successfully deleted Annotator');
-                getList();
             }
         });
     });
@@ -159,24 +127,10 @@ $(document).ready(function(){
         }
     });
 
-    $("#updateAnnotatorModal #updateAnnotator").click(function(){
-        var datas = getDatas();
-        datas['label'] = $("#updateAnnotatorModal #updateannotatorlabel").val();
-        $.ajax({
-            url : "/updateAnnotator",
-            type : "POST",
-            dataType:"json",
-            data : {key: key, data: datas},
-            success: function (result){
-                getList();
-                toastr.success('Successfully updated Annotator');
-                $("#updateAnnotatorModal").modal('toggle');
-            }
-        });
-    });
-
+    if (data !== null) {
+        $("#annotator_image").loadData(data);
+    }
     CheckDot();
-    getList();
 });
 
 function getDatas() {
@@ -196,34 +150,6 @@ function getDatas() {
         label: $("#annotatorModal #annotatorlabel").val()
     };
     return annotator;
-}
-
-function getList() {
-    $.ajax({
-        url : "/listAnnotator",
-        type : "GET",
-        dataType:"json",
-        success : function (result){
-            listAnnotator = result;
-            $("#listAnnotator tbody").empty();
-            var i=0;
-            $.each(result, function(key, value) {
-                i++;
-                $("#listAnnotator tbody").append(`
-                    <tr key="`+key+`">
-                        <td style="width: 70px;">`+i+`</td>
-                        <td>
-                            <span class="label">`+value.label+`</span>
-                        </td>
-                        <td style="width: 152px;">
-                            <button type="button" class="btn btn-success btn-sm update">Update</button>
-                            <button type="button" class="btn btn-danger btn-sm delete">Delete</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
-    });
 }
 
 function hexc(colorval) {
