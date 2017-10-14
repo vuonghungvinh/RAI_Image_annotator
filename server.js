@@ -68,6 +68,11 @@ app.post('/login', function(req, res, next){
     }
 });
 
+app.get('/logout', function(req, res, next){
+    delete req.session.authenticated;
+    res.redirect('/login');
+});
+
 app.get("/listannotator", function(req, res, next){
     var ref = firebase.database().ref();
     ref.once("value", function(snapshot) {
