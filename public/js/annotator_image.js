@@ -29,7 +29,7 @@
             y=0;
         }
         this.find(".contentAnnotator").append("\
-            <button style='width: 34px; height: 34px; position: absolute; left: "+x+"%; top: "+y+"%; background: red; border-radius: 50%' type='button' class='note_annotator' data-container='body' data-toggle='popover' title='Title' data-placement='top' data-content='Content.'>\
+            <button style='width: 34px; height: 34px; position: absolute; left: "+x+"%; top: "+y+"%; background: red; border-radius: 50%' type='button' class='note_annotator' data-container='body' data-toggle='popover' title='Title' data-placement='top' raw-content='Content.' data-html='true' data-content='<p>Content.</p>'>\
                 1\
             </button>\
         ");
@@ -45,9 +45,10 @@
         });
     };
 
-    $.fn.updateDot = function(title, content, color, bcolor, titledot) {
+    $.fn.updateDot = function(title, contenthtml, rawcontent, color, bcolor, titledot) {
         $(this).css({background: bcolor, color: color});
-        $(this).attr("data-content", content);
+        $(this).attr("data-content", contenthtml);
+        $(this).attr("raw-content", rawcontent);
         $(this).attr("data-original-title", title);
         $(this).text(titledot);
     };
@@ -62,6 +63,7 @@
     }
 
     $.fn.loadData = function(data) {
+        $("#urlImage").val(data.src);
         $(this).css({width: data.width, height: data.height});
         $(this).empty();
         $(this).append("\
@@ -70,12 +72,14 @@
         $(this).append("\
             <div class='contentAnnotator'></div>\
         ");
-        for (var i=0; i < data.dots.length; i++) {
-            $(this).find(".contentAnnotator").append("\
-                <button style='width: 34px; height: 34px; position: absolute; left: "+data.dots[i].left+"; top: "+data.dots[i].top+"; background: "+data.dots[i].background+"; color: "+data.dots[i].color+"; border-radius: 50%' type='button' class='note_annotator' data-container='body' data-toggle='popover' title='"+data.dots[i]['data-original-title']+"' data-placement='top' data-content='"+data.dots[i]['data-content']+"'>\
-                    "+data.dots[i].text+"\
-                </button>\
-            ");
+        if (data.dots !== undefined) {
+            for (var i=0; i < data.dots.length; i++) {
+                $(this).find(".contentAnnotator").append("\
+                    <button style='width: 34px; height: 34px; position: absolute; left: "+data.dots[i].left+"; top: "+data.dots[i].top+"; background: "+data.dots[i].background+"; color: "+data.dots[i].color+"; border-radius: 50%' type='button' class='note_annotator' data-container='body' data-toggle='popover' title='"+data.dots[i]['data-original-title']+"' data-placement='top' data-html='true' raw-content='"+data.dots[i]['raw-content']+"' data-content='"+data.dots[i]['data-content']+"'>\
+                        "+data.dots[i].text+"\
+                    </button>\
+                ");
+            }
         }
         $('.note_annotator').popover({
             trigger: 'focus'
@@ -89,4 +93,4 @@
         });
     }
 
- })( jQuery );
+})( jQuery );

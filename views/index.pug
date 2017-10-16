@@ -8,10 +8,12 @@ html
         link(href='//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css', rel='stylesheet')
         link(href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css', rel='stylesheet')
         link(href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css', rel='stylesheet')
+        link(href='https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', rel='stylesheet')
         script(src="https://code.jquery.com/jquery-3.2.1.min.js")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js")
         script(src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js")
+        script(src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js")
         script(src="js/annotator_image.js")
         script(src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js")
         script(src="js/custom.js")
@@ -53,37 +55,37 @@ html
                         div.col.dottool
                             div.borderContent
                                 div.row
-                                    div.col
+                                    div.col.col-md-8
                                         label(for="title") Title
                                         div.input-group
                                             input.form-control#title(type="text")
-                                    div.col
+                                        br
                                         label(for="contenttext") Content text
-                                        div.input-group
-                                            input#contenttext.form-control(type="text")
-                                br
-                                div.row
+                                        div.input-group.container_contenttext
+                                            textarea#contenttext.form-control(type="text")
                                     div.col
                                         label(for="bcolor") Background Color
                                         div.input-group
                                             input#bcolor.form-control(type="color", value="#ff0000", aria-describedby="bcolor-addon")
                                             span.input-group-addon#bcolor-addon #ff0000
-                                    div.col
-                                        label(for="titledot") Title dot
-                                        div.input-group
-                                            input#titledot.form-control(type="text")
-                                br
-                                div.row
-                                    div.col
+                                        br
                                         label(for="color") Text Color
                                         div.input-group
                                             input.form-control#color(type="color", value="#000000", aria-describedby="color-addon")
                                             span#color-addon.input-group-addon #000000
-                                    div.col.contentdeletedot
-                                        button.btn.btn-danger.btn-sm#deletedot(disabled type="button") Delete Dot
+                                        br
+                                        label(for="titledot") Title dot
+                                        div.input-group
+                                            input#titledot.form-control(type="text")
+                                        br
+                                        div.contentdeletedot
+                                            button.btn.btn-danger.btn-sm#deletedot(disabled type="button") Delete Dot
                 br
                 p.createcontent
-                    button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Save Annotation
+                    if !key
+                        button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Save Annotation
+                    if key
+                        button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Update Annotation
                     button.btn.btn-success.btn-sm.create(type="button") Create embedding code
                     a(href="/listannotator").btn.btn-danger.btn-sm.back(type="button") Cancel
             //- createModal
@@ -97,9 +99,13 @@ html
                         div.modal-body
                             div.input-group
                                 input#annotatorlabel.form-control(type="text", placeholder="Annotator Name")
-                            span.errorhidden.errname Name is required!
+                            span.errorhidden.errname.error Name is required!
                         div.modal-footer
                             button.btn.btn-danger(type="button", data-dismiss="modal") Cancel
-                            button.btn.btn-primary(type="button", disabled id="saveAnnotator") Create
+                            if !key
+                                button.btn.btn-primary(type="button", disabled id="saveAnnotator") Create
+                            if key
+                                button.btn.btn-success(type="button", id="saveAnnotator") Update
         script(type="text/javascript").
                                         var data = !{JSON.stringify(data)};
+                                        var key = !{JSON.stringify(key||'')};

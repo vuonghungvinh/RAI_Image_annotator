@@ -1,6 +1,10 @@
 var dot=null;
 var listAnnotator;
 var key;
+var md;
+var contenthtml;
+var rawcontent;
+
 $(document).ready(function(){
 
     if ($("#urlImage").length > 0){
@@ -18,6 +22,7 @@ $(document).ready(function(){
         }
         $("#annotator_image").initAnnotatorImage(w, h, $("#urlImage")[0].value);
     }
+    md = new SimpleMDE({ element: $("#contenttext")[0] });
     $("#annotator_image").on("click", "img", function(e){
         var x = (e.offsetX-17)/e.target.clientWidth*100;
         var y = (e.offsetY-17)/e.target.clientHeight*100;
@@ -46,11 +51,22 @@ $(document).ready(function(){
         updateDot();
     });
 
+    md.codemirror.on("change", function(){
+        if (dot !== null) {
+            contenthtml = md.options.previewRender(md.value());
+            rawcontent = md.value();
+            updateDot();
+        }
+    });
+
     $("#annotator_image").on("click", ".contentAnnotator .note_annotator", function(e){
         dot = e.target;
         $('.contentTool #title').val($(dot).attr("data-original-title"));
         $('.contentTool #contenttext').val($(dot).attr("data-content"));
         $('.contentTool #titledot').val($(dot).text().trim());
+        contenthtml = $(dot).attr("data-content");
+        rawcontent = $(dot).attr("raw-content");
+        md.value($(dot).attr("raw-content"));
         $('.contentTool #bcolor').val(hexc($(dot).css('backgroundColor')));
         $('.contentTool #color').val(hexc($(dot).css('color')));
         $(dot).selectDot();
@@ -61,6 +77,7 @@ $(document).ready(function(){
         if (dot != null) {
             $(dot).removeDot();
             dot = null;
+            md.value('');
             CheckDot();
         }    
     });
@@ -79,7 +96,7 @@ $(document).ready(function(){
             type : "POST",
             dataType:"json",
             data : {
-                 html : $("#annotator_image")[0].outerHTML
+                html : $("#annotator_image")[0].outerHTML
             },
             success : function (result){
                 window.open("review/"+result['id'], '_blank');
@@ -91,6 +108,11 @@ $(document).ready(function(){
         $("#annotatorModal .errname").addClass("hidden");
         $("#annotatorModal #annotatorlabel").val("");
         $("#saveAnnotator").attr("disabled", "disabled");
+        if (key && key.length > 0) {
+            $("#annotatorModal #annotatorlabel").val(data.label);
+            $("#saveAnnotator").removeAttr('disabled');
+        }
+        
     });
 
     $("#annotatorModal #annotatorlabel").on("change keyup paste", function(){
@@ -105,16 +127,29 @@ $(document).ready(function(){
 
     $("#saveAnnotator").click(function(){
         var annotator = getDatas();
-        $.ajax({
-            url : "/saveAnnotator",
-            type : "POST",
-            dataType:"json",
-            data : annotator,
-            success: function (result){
-                $('#annotatorModal').modal('toggle');
-                toastr.success('Successfully created new Annotator');
-            }
-        });
+        if (key && key.length > 0) {
+            $.ajax({
+                url : "/updateAnnotator",
+                type : "POST",
+                dataType:"json",
+                data : {key: key, data: annotator},
+                success: function (result){
+                    toastr.success('Successfully updated Annotator');
+                    $("#annotatorModal").modal('toggle');
+                }
+            });
+        } else {
+            $.ajax({
+                url : "/saveAnnotator",
+                type : "POST",
+                dataType:"json",
+                data : annotator,
+                success: function (result){
+                    $('#annotatorModal').modal('toggle');
+                    toastr.success('Successfully created new Annotator');
+                }
+            });
+        }
     });
     
     $("#updateAnnotatorModal #updateannotatorlabel").on("change keyup paste", function(){
@@ -136,7 +171,7 @@ $(document).ready(function(){
 function getDatas() {
     var dots = [];
     $("#annotator_image").children(".contentAnnotator").children(".note_annotator").each(function(){
-        var dot = { text: $(this).text().trim(), left: $(this).css("left"), top: $(this).css("top"), background: hexc($(this).css("backgroundColor")), color: hexc($(this).css("color")), "data-content": $(this).attr("data-content"), "data-original-title": $(this).attr("data-original-title") };
+        var dot = { text: $(this).text().trim(), left: $(this).css("left"), top: $(this).css("top"), background: hexc($(this).css("backgroundColor")), color: hexc($(this).css("color")), "data-content": $(this).attr("data-content"), "raw-content": $(this).attr("raw-content"), "data-original-title": $(this).attr("data-original-title") };
         dots.push(dot);
     });
     var src = $("#annotator_image").children("img").attr("src");
@@ -178,5 +213,5 @@ function updateDot() {
     var color = $(".contentTool #color").val();
     var bcolor = $(".contentTool #bcolor").val();
     var titledot = $(".contentTool #titledot").val();
-    $(dot).updateDot(title, content, color, bcolor, titledot);
+    $(dot).updateDot(title, contenthtml, rawcontent, color, bcolor, titledot);
 }

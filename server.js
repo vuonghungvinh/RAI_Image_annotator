@@ -194,9 +194,9 @@ app.get('/:key', function (req, res, next) {
     var postsRef = ref.child("annotators/"+req.params.key);
     postsRef.once("value", function(snapshot) {
         if (snapshot.val() === null) {
-            res.render("index", {"data": null});
+            res.render("index", { "data": null });
         } else {
-            res.render("index", {"data": snapshot.val()});
+            res.render("index", { "data": snapshot.val(), "key": req.params.key });
         }
     }, function (error) {
         res.render("index", {"data": null});

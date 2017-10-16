@@ -53,3 +53,7 @@ button{
 .contentdeletedot #deletedot{
     align-self: flex-end;
 }
+
+.dottool .container_contenttext{
+    display: block;
+}
