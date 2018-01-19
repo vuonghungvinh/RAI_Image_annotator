@@ -204,7 +204,11 @@ function CheckDot() {
     } else {
         $("#deletedot").removeAttr("disabled");
         $('.contentTool .dottool').find('input').removeAttr('disabled');
-    } 
+    }
+    $('.note_annotator').on('shown.bs.popover', function () {
+        $('a').attr('target', '_blank');
+        $('a.back').removeAttr('target');
+    });
 }
 
 function updateDot() {

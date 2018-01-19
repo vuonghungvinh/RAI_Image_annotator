@@ -14,7 +14,7 @@ html
     body
         if id
             include ./logout.pug
-        div.container
+        div(class= isReview ? "container" : "")
             if id
                 br
                 h1.text-center Review!

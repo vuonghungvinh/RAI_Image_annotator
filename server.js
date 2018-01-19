@@ -133,7 +133,7 @@ app.get("/review/:id", function(req, res, next){
     if (datas[req.params.id] === undefined) {
         res.render("error");
     } else {
-        res.render("review", {html: datas[req.params.id], id: req.params.id});
+        res.render("review", {html: datas[req.params.id], id: req.params.id, isReview: true});
     }
 });
 
@@ -161,7 +161,7 @@ app.get("/download/:id", function(req, res, next){
                             <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>\
                         </head>\
                         <body>\
-                            <div class="container">\
+                            <div>\
                                 {{{html}}}\
                             </div>\
                         </body>\
@@ -172,6 +172,9 @@ app.get("/download/:id", function(req, res, next){
                                 });\
                                 $(function () {\
                                     $(\'[data-toggle="popover"]\').popover()\
+                                });\
+                                $(\'.note_annotator\').on(\'shown.bs.popover\', function () {\
+                                    $(\'a\').attr(\'target\', \'_blank\');\
                                 });\
                             });\
                         </script>\
