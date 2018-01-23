@@ -41,14 +41,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //To parse json data
 app.use(bodyParser.json());
 
-function checkAuth(req, res, next) {
-    if (req.url !== '/login' && (!req.session || !req.session.authenticated)) {
-        res.redirect('/login');
-        return;
-    }
-    next();
-}
-
 app.get('/', function (req, res, next) {    
     res.render("index", {"data": null});
 });
