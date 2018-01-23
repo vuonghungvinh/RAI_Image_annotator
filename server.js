@@ -12,12 +12,12 @@ var firebase = require("firebase");
 require("firebase/auth");
 require("firebase/database");
 var config = {
-    apiKey: "AIzaSyCSJNAsvzXCW4yZELnGK7wo51jQ1iOKipA",
-    authDomain: "annotatorimage.firebaseapp.com",
-    databaseURL: "https://annotatorimage.firebaseio.com",
-    projectId: "annotatorimage",
-    storageBucket: "annotatorimage.appspot.com",
-    messagingSenderId: "479345588309"
+    apiKey: "AIzaSyBmy4QH_TyCQ_NwuPBFczJNEa2WoJwrbtM",
+    authDomain: "annotatorimagefree.firebaseapp.com",
+    databaseURL: "https://annotatorimagefree.firebaseio.com",
+    projectId: "annotatorimagefree",
+    storageBucket: "annotatorimagefree.appspot.com",
+    messagingSenderId: "902642725349"
 };
 firebase.initializeApp(config);
 var email = "vuonghungvinhit@gmail.com";
@@ -49,28 +49,8 @@ function checkAuth(req, res, next) {
     next();
 }
 
-app.use(checkAuth);
-
 app.get('/', function (req, res, next) {    
     res.render("index", {"data": null});
-});
-
-app.get('/login', function(req, res, next){
-    res.render('login', {error: false});
-});
-
-app.post('/login', function(req, res, next){
-    if (req.body.username && req.body.username === 'annotatorimage' && req.body.password && req.body.password === '123456') {
-        req.session.authenticated = true;
-        res.redirect('/listannotator');
-    } else {
-        res.render('login', {error: true, username: req.body.username});
-    }
-});
-
-app.get('/logout', function(req, res, next){
-    delete req.session.authenticated;
-    res.redirect('/login');
 });
 
 app.get("/listannotator", function(req, res, next){
