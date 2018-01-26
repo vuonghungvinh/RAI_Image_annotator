@@ -1,9 +1,10 @@
-var dot=null;
+var dot = null;
 var listAnnotator;
 var key;
 var md;
 var contenthtml;
 var rawcontent;
+var isCreate = false;
 
 $(document).ready(function(){
 
@@ -91,20 +92,42 @@ $(document).ready(function(){
     });
 
     $(".createcontent .create").click(function(){
-        $.ajax({
-            url : "/create",
-            type : "POST",
-            dataType:"json",
-            data : {
-                html : $("#annotator_image")[0].outerHTML
-            },
-            success : function (result){
-                window.open("review/"+result['id'], '_blank');
-            }
-        });
+        if ($(this).attr('key') === undefined || $(this).attr('key').length < 1) {
+            isCreate = true;
+            $("#annotatorModal .errname").addClass("hidden");
+            $("#annotatorModal #annotatorlabel").val("");
+            $("#saveAnnotator").attr("disabled", "disabled");
+            toastr.warning('Please save Annotator before create embedding code');
+        } else {
+            var key = $(this).attr('key');
+            var annotator = getDatas();
+            annotator['label'] = data.label;
+            $.ajax({
+                url : "/updateAnnotator",
+                type : "POST",
+                dataType:"json",
+                data : {key: $(this).attr('key'), data: annotator},
+                success: function (result){
+                    window.location = '/' + key;
+                    window.open("review/" + key, '_blank');
+                }
+            });
+        }
+        // $.ajax({
+        //     url : "/create",
+        //     type : "POST",
+        //     dataType:"json",
+        //     data : {
+        //         html : $("#annotator_image")[0].outerHTML
+        //     },
+        //     success : function (result){
+        //         window.open("review/"+result['id'], '_blank');
+        //     }
+        // });
     });
 
     $(".createcontent .btnsave").click(function(){
+        isCreate = false;
         $("#annotatorModal .errname").addClass("hidden");
         $("#annotatorModal #annotatorlabel").val("");
         $("#saveAnnotator").attr("disabled", "disabled");
@@ -145,8 +168,15 @@ $(document).ready(function(){
                 dataType:"json",
                 data : annotator,
                 success: function (result){
-                    $('#annotatorModal').modal('toggle');
-                    toastr.success('Successfully created new Annotator');
+                    console.log(result);
+                    if (isCreate) {
+                        $('#annotatorModal').modal('toggle');
+                        window.location = '/' + result.key;
+                        window.open("review/" + result.key, '_blank');
+                    } else {
+                        $('#annotatorModal').modal('toggle');
+                        toastr.success('Successfully created new Annotator');
+                    }
                 }
             });
         }
@@ -182,7 +212,8 @@ function getDatas() {
         width: width,
         height: height,
         dots: dots,
-        label: $("#annotatorModal #annotatorlabel").val()
+        label: $("#annotatorModal #annotatorlabel").val(),
+        html : $("#annotator_image")[0].outerHTML
     };
     return annotator;
 }

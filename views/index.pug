@@ -85,7 +85,7 @@ html
                         button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Save Annotation
                     if key
                         button.btn.btn-info.btn-sm.btnsave(type="button", data-toggle="modal", data-target="#annotatorModal") Update Annotation
-                    button.btn.btn-success.btn-sm.create(type="button") Create embedding code
+                    button.btn.btn-success.btn-sm.create(type="button", data-toggle="modal", key= key, data-target= (key ? "" : "#annotatorModal")) Create embedding code
                     a(href="/listannotator").btn.btn-danger.btn-sm.back(type="button") Cancel
             //- createModal
             div#annotatorModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="exampleModalLabel", aria-hidden="true")

@@ -58,20 +58,21 @@ app.get("/listannotator", function(req, res, next){
     });
 });
 
-app.post('/create', function(req, res, next) {
-    var id = makeid();
-    while (datas[id] != undefined) {
-        id = makeid();
-    }
-    datas[id] = req.body['html'];
-    res.json({id: id});
-});
+// app.post('/create', function(req, res, next) {
+//     var id = makeid();
+//     while (datas[id] != undefined) {
+//         id = makeid();
+//     }
+//     datas[id] = req.body['html'];
+//     res.json({id: id});
+// });
 
 app.post("/saveAnnotator", function(req, res, next){
     var ref = firebase.database().ref();
     var postsRef = ref.child("annotators");
-    postsRef.push(req.body);
-    res.json({status:"ok"});
+    var result = postsRef.push(req.body);
+    console.log(result.key);
+    res.json({key: result.key});
 });
 
 app.post("/updateAnnotator", function(req, res, next){
@@ -101,28 +102,56 @@ app.post("/listAnnotator", function(req, res, next){
     });
 });
 
-app.get("/review/:id", function(req, res, next){
-    if (datas[req.params.id] === undefined) {
+app.get("/review/:key", function(req, res, next){
+    // if (datas[req.params.id] === undefined) {
+    //     res.render("error");
+    // } else {
+    //     res.render("review", {html: datas[req.params.id], id: req.params.id, isReview: true});
+    // }
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.params.key);
+    postsRef.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.render("error");
+        } else {
+            res.render("review", {html: snapshot.val().html, id: req.params.key, isReview: true});
+        }
+    }, function (error) {
         res.render("error");
-    } else {
-        res.render("review", {html: datas[req.params.id], id: req.params.id, isReview: true});
-    }
+    });
 });
 
-app.get("/annotator/:id", function(req, res, next) {
-    if (datas[req.params.id] === undefined) {
+app.get("/annotator/:key", function(req, res, next) {
+    // if (datas[req.params.id] === undefined) {
+    //     res.render("error");
+    // } else {
+    //     res.render("annotator", {html: datas[req.params.id]});
+    // }
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.params.key);
+    postsRef.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.render("error");
+        } else {
+            res.render("annotator", {html: snapshot.val().html});
+        }
+    }, function (error) {
         res.render("error");
-    } else {
-        res.render("annotator", {html: datas[req.params.id]});
-    }
+    });
 });
 
-app.get("/download/:id", function(req, res, next){
-    if (datas[req.params.id] === undefined) {
-        res.render("error");
-        return;
-    } 
-    var source = '<!DOCTYPE html>\
+app.get("/download/:key", function(req, res, next){
+    // if (datas[req.params.id] === undefined) {
+    //     res.render("error");
+    //     return;
+    // } 
+    var ref = firebase.database().ref();
+    var postsRef = ref.child("annotators/"+req.params.key);
+    postsRef.once("value", function(snapshot) {
+        if (snapshot.val() === null) {
+            res.render("error");
+        } else {
+            var source = '<!DOCTYPE html>\
                     <html>\
                         <head>\
                             <title>Image annotator</title>\
@@ -151,16 +180,20 @@ app.get("/download/:id", function(req, res, next){
                             });\
                         </script>\
                     </html>';
-    var template = Handlebars.compile(source);
+            var template = Handlebars.compile(source);
 
-    var data = { "html":  datas[req.params.id] };
-    var result = template(data);
-    var fs = require('fs');
-    fs.writeFile("annotatorImage.html", result, function(err) {
-        res.download("annotatorImage.html");
-        if(err) {
-            return console.log(err);
+            var data = { "html":  snapshot.val().html };
+            var result = template(data);
+            var fs = require('fs');
+            fs.writeFile("annotatorImage.html", result, function(err) {
+                res.download("annotatorImage.html");
+                if(err) {
+                    return console.log(err);
+                }
+            });
         }
+    }, function (error) {
+        res.render("error");
     });
 });
 
